@@ -8,11 +8,36 @@ using System.Linq;
 
 public class CustomTerrain : MonoBehaviour
 {
+	// Heightmap Vars -------------------------------
 	public Vector2 randomHeightRange = new Vector2(0, 0.1f);
 	public Texture2D heightMapImage;
 	public Vector3 heightMapScale = Vector3.one;
+
+	// Perlin Noise ---------------------------------
+	public float perlinXScale = 0.01f;
+	public float perlinYScale = 0.01f;
+	public int perlinOffsetX = 0;
+	public int perlinOffsetY = 0;
+
+	// Terrain Data Objs ----------------------------
 	public Terrain terrain;
 	public TerrainData terrainData;
+
+	public void Perlin()
+	{
+		float[,] heightMap = new float[terrainData.heightmapResolution, terrainData.heightmapResolution];
+
+		for (int y = 0; y < terrainData.heightmapResolution; y++)
+		{
+			for (int x = 0; x < terrainData.heightmapResolution; x++)
+			{
+				heightMap[x, y] = Mathf.PerlinNoise(
+					(x + perlinOffsetX) * perlinXScale,
+					(y + perlinOffsetY) * perlinYScale);
+			}
+		}
+		terrainData.SetHeights(0, 0, heightMap);
+	}
 
 	public void RandomTerrain()
 	{
@@ -21,9 +46,9 @@ public class CustomTerrain : MonoBehaviour
 
 		for (int x = 0; x < terrainData.heightmapResolution; x++)
 		{
-			for (int z = 0; z < terrainData.heightmapResolution; z++)
+			for (int y = 0; y < terrainData.heightmapResolution; y++)
 			{
-				heightMap[x, z] += UnityEngine.Random.Range(randomHeightRange.x, randomHeightRange.y);
+				heightMap[x, y] += UnityEngine.Random.Range(randomHeightRange.x, randomHeightRange.y);
 			}
 		}
 		terrainData.SetHeights(0, 0, heightMap);
@@ -36,10 +61,10 @@ public class CustomTerrain : MonoBehaviour
 
 		for (int x = 0; x < terrainData.heightmapResolution; x++)
 		{
-			for (int z = 0; z < terrainData.heightmapResolution; z++)
+			for (int y = 0; y < terrainData.heightmapResolution; y++)
 			{
-				heightMap[x, z] = heightMapImage.GetPixel((int)(x * heightMapScale.x),
-					(int)(z * heightMapScale.z)).grayscale * heightMapScale.y;
+				heightMap[x, y] = heightMapImage.GetPixel((int)(x * heightMapScale.x),
+					(int)(y * heightMapScale.z)).grayscale * heightMapScale.y;
 			}
 		}
 		terrainData.SetHeights(0, 0, heightMap);
@@ -52,9 +77,9 @@ public class CustomTerrain : MonoBehaviour
 
 		for (int x = 0; x < terrainData.heightmapResolution; x++)
 		{
-			for (int z = 0; z < terrainData.heightmapResolution; z++)
+			for (int y = 0; y < terrainData.heightmapResolution; y++)
 			{
-				heightMap[x, z] = 0;
+				heightMap[x, y] = 0;
 			}
 		}
 		terrainData.SetHeights(0, 0, heightMap);
