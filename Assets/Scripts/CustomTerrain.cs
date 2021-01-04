@@ -13,27 +13,89 @@ public class CustomTerrain : MonoBehaviour
 	public Texture2D heightMapImage;
 	public Vector3 heightMapScale = Vector3.one;
 
+	public bool resetTerrain = true;
+
 	// Perlin Noise ---------------------------------
 	public float perlinXScale = 0.01f;
 	public float perlinYScale = 0.01f;
 	public int perlinOffsetX = 0;
 	public int perlinOffsetY = 0;
+	public int perlinOctaves = 3;
+	public float perlinPersistance = 8;
+	public float perlinHeightScale = 0.09f;
+	public float perlinFreqMultiplier = 2f;
+
+	// Multiple Perlin ------------------------------
+	[System.Serializable]
+	public class PerlinParameters
+	{
+		public float perlinXScale = 0.01f;
+		public float perlinYScale = 0.01f;
+		public int perlinOffsetX = 0;
+		public int perlinOffsetY = 0;
+		public int perlinOctaves = 3;
+		public float perlinPersistance = 0.3f;
+		public float perlinHeightScale = 0.3f;
+		public float perlinFreqMultiplier = 2f;
+		public bool remove = false;
+	}
+
+	public List<PerlinParameters> perlinParameters = new List<PerlinParameters>()
+	{ 
+		new PerlinParameters()
+	};
 
 	// Terrain Data Objs ----------------------------
 	public Terrain terrain;
 	public TerrainData terrainData;
 
+	float[,] GetHeightMap()
+	{
+		if (!resetTerrain)
+			return terrainData.GetHeights(
+				0, 0, terrainData.heightmapResolution, 
+				terrainData.heightmapResolution);
+		else
+			return new float[
+				terrainData.heightmapResolution, 
+				terrainData.heightmapResolution];
+	}
+
 	public void Perlin()
 	{
-		float[,] heightMap = new float[terrainData.heightmapResolution, terrainData.heightmapResolution];
+		float[,] heightMap = GetHeightMap();
 
 		for (int y = 0; y < terrainData.heightmapResolution; y++)
 		{
 			for (int x = 0; x < terrainData.heightmapResolution; x++)
 			{
-				heightMap[x, y] = Mathf.PerlinNoise(
-					(x + perlinOffsetX) * perlinXScale,
-					(y + perlinOffsetY) * perlinYScale);
+				heightMap[x, y] += Utils.FBM(
+					(x+perlinOffsetX) * perlinXScale,
+					(y+perlinOffsetY) * perlinYScale,
+					perlinOctaves,
+					perlinPersistance,
+					perlinFreqMultiplier) * perlinHeightScale;
+			}
+		}
+		terrainData.SetHeights(0, 0, heightMap);
+	}
+
+	public void MultiplePerlinTerrain()
+	{
+		float[,] heightMap = GetHeightMap();
+		for (int y = 0; y < terrainData.heightmapResolution; y++)
+		{
+			for (int x = 0; x < terrainData.heightmapResolution; x++)
+			{
+				foreach (PerlinParameters p in perlinParameters)
+				{
+					heightMap[x, y] += Utils.FBM(
+						(x + p.perlinOffsetX) * p.perlinXScale,
+						(y + p.perlinOffsetY) * p.perlinYScale,
+						p.perlinOctaves,
+						p.perlinPersistance,
+						p.perlinFreqMultiplier) * p.perlinHeightScale;
+				}
 			}
 		}
 		terrainData.SetHeights(0, 0, heightMap);
@@ -41,8 +103,7 @@ public class CustomTerrain : MonoBehaviour
 
 	public void RandomTerrain()
 	{
-		float[,] heightMap = terrainData.GetHeights(0, 0, 
-			terrainData.heightmapResolution, terrainData.heightmapResolution);
+		float[,] heightMap = GetHeightMap();
 
 		for (int x = 0; x < terrainData.heightmapResolution; x++)
 		{
@@ -56,14 +117,13 @@ public class CustomTerrain : MonoBehaviour
 
 	public void LoadHeightMapTexture()
 	{
-		float[,] heightMap;
-		heightMap = new float[terrainData.heightmapResolution, terrainData.heightmapResolution];
+		float[,] heightMap = GetHeightMap();
 
 		for (int x = 0; x < terrainData.heightmapResolution; x++)
 		{
 			for (int y = 0; y < terrainData.heightmapResolution; y++)
 			{
-				heightMap[x, y] = heightMapImage.GetPixel((int)(x * heightMapScale.x),
+				heightMap[x, y] += heightMapImage.GetPixel((int)(x * heightMapScale.x),
 					(int)(y * heightMapScale.z)).grayscale * heightMapScale.y;
 			}
 		}
@@ -83,6 +143,21 @@ public class CustomTerrain : MonoBehaviour
 			}
 		}
 		terrainData.SetHeights(0, 0, heightMap);
+	}
+
+	public void AddNewPerlin() => perlinParameters.Add(new PerlinParameters());
+
+	public void RemovePerlin()
+	{
+		List<PerlinParameters> keptPerlinParamenters = new List<PerlinParameters>();
+		for (int i= 0; i< perlinParameters.Count; i++)
+		{
+			if (!perlinParameters[i].remove)
+				keptPerlinParamenters.Add(perlinParameters[i]);
+		}
+		if (keptPerlinParamenters.Count == 0)
+			keptPerlinParamenters.Add(perlinParameters[0]);
+		perlinParameters = keptPerlinParamenters;
 	}
 
 	private void OnEnable()
