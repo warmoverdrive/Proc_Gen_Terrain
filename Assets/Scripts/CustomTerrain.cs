@@ -45,6 +45,13 @@ public class CustomTerrain : MonoBehaviour
 		new PerlinParameters()
 	};
 
+	// Voronoi --------------------------------------
+	public int voronoiPeakCount = 4;
+	public float voronoiMinHeight = 0.1f;
+	public float voronoiMaxHeight = 0.9f;
+	public float voronoiFalloff = 0.2f;
+	public float voronoiDropoff = 0.6f;
+
 	// Terrain Data Objs ----------------------------
 	public Terrain terrain;
 	public TerrainData terrainData;
@@ -59,6 +66,55 @@ public class CustomTerrain : MonoBehaviour
 			return new float[
 				terrainData.heightmapResolution, 
 				terrainData.heightmapResolution];
+	}
+
+	public void Voronoi()
+	{
+		float[,] heightMap = GetHeightMap();
+
+		for (int i = 0; i < voronoiPeakCount; i++)
+		{
+			Vector3 peak = new Vector3(
+				UnityEngine.Random.Range(0, terrainData.heightmapResolution),
+				UnityEngine.Random.Range(voronoiMinHeight, voronoiMaxHeight),
+				UnityEngine.Random.Range(0, terrainData.heightmapResolution));
+
+			if (heightMap[(int)peak.x, (int)peak.z] < peak.y)
+				heightMap[(int)peak.x, (int)peak.z] = peak.y;
+			else continue;
+
+			Vector2 peakLocation = new Vector2(peak.x, peak.z);
+			float maxDistance = Vector2.Distance(Vector2.zero,
+				new Vector2(terrainData.heightmapResolution, terrainData.heightmapResolution));
+
+			for (int y = 0; y < terrainData.heightmapResolution; y++)
+			{
+				for (int x = 0; x < terrainData.heightmapResolution; x++)
+				{
+					float distanceToPeak = Vector2.Distance(
+							peakLocation, new Vector2(x, y)) / maxDistance;
+					float h = peak.y - distanceToPeak * voronoiFalloff -
+						Mathf.Pow(distanceToPeak, voronoiDropoff);
+
+					// only adjust height if existing point is less than new value
+					if (heightMap[x, y] < h)
+						heightMap[x, y] = h;
+/*					if (!(x == peak.x && y == peak.z))
+					{
+						float distanceToPeak = Vector2.Distance(
+							peakLocation, new Vector2(x, y)) / maxDistance;
+						float h = peak.y - distanceToPeak * voronoiFalloff -
+							Mathf.Pow(distanceToPeak, voronoiDropoff);
+
+						// only adjust height if existing point is less than new value
+						if(heightMap[x,y] < h)
+							heightMap[x, y] = h;
+					}*/
+				}
+			}
+		}
+
+		terrainData.SetHeights(0, 0, heightMap);
 	}
 
 	public void Perlin()
