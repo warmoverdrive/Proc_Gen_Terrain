@@ -9,6 +9,7 @@ public class CustomTerrainEditor : Editor
 {
 	// properties ------------
 	SerializedProperty resetTerrain;
+	SerializedProperty smoothingIterations;
 	SerializedProperty randomHeightRange;
 	SerializedProperty heightMapScale;
 	SerializedProperty heightMapImage;
@@ -44,10 +45,12 @@ public class CustomTerrainEditor : Editor
 	bool showMultiplePerlin = false;
 	bool showVoronoi = false;
 	bool showMPD = false;
+	bool showSmooth = false;
 
 	private void OnEnable()
 	{
 		resetTerrain = serializedObject.FindProperty("resetTerrain");
+		smoothingIterations = serializedObject.FindProperty("smoothingIterations");
 
 		randomHeightRange = serializedObject.FindProperty("randomHeightRange");
 		heightMapScale = serializedObject.FindProperty("heightMapScale");
@@ -147,6 +150,16 @@ public class CustomTerrainEditor : Editor
 			EditorGUILayout.Slider(MPDRoughness, 0f, 10f, new GUIContent("Roughness"));
 			if (GUILayout.Button("Run Midpoint Displacement"))
 				terrain.MidPointDisplacement();
+		}
+
+		showSmooth = EditorGUILayout.Foldout(showSmooth, "Smoothing");
+		if (showSmooth)
+		{
+			EditorGUILayout.LabelField("", GUI.skin.horizontalSlider);
+			GUILayout.Label("Smoothing Options", EditorStyles.boldLabel);
+			EditorGUILayout.IntSlider(smoothingIterations, 1, 10, new GUIContent("Smoothing Iterations"));
+			if (GUILayout.Button("Apply Smoothing"))
+				terrain.Smooth();
 		}
 
 		showRandom = EditorGUILayout.Foldout(showRandom, "Random");

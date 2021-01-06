@@ -14,6 +14,7 @@ public class CustomTerrain : MonoBehaviour
 	public Vector3 heightMapScale = Vector3.one;
 
 	public bool resetTerrain = true;
+	public int smoothingIterations = 1;
 
 	// Perlin Noise ---------------------------------
 	public float perlinXScale = 0.01f;
@@ -74,6 +75,55 @@ public class CustomTerrain : MonoBehaviour
 			return new float[
 				terrainData.heightmapResolution, 
 				terrainData.heightmapResolution];
+	}
+
+	List<Vector2> GenerateNeighbors(Vector2 pos, int width, int height)
+	{
+		List<Vector2> neighbors = new List<Vector2>();
+		for (int y = -1; y <= 1; y++)
+			for (int x = -1; x <= 1; x++)
+				if(!(x==0 && y==0))
+				{
+					Vector2 nPos = new Vector2(
+						Mathf.Clamp(pos.x + x, 0, width - 1),
+						Mathf.Clamp(pos.y + y, 0, height - 1));
+					if (!neighbors.Contains(nPos))
+						neighbors.Add(nPos);
+				}
+		return neighbors;
+	}
+
+	public void Smooth()
+	{
+		float[,] currentHeightMap = terrainData.GetHeights(0, 0, 
+			terrainData.heightmapResolution, terrainData.heightmapResolution);
+		float[,] newHeightMap = currentHeightMap;
+		float smoothProgress = 0;
+		EditorUtility.DisplayProgressBar("Smoothing Terrain", "Progress",
+			smoothProgress);
+
+		for (int i = 0; i < smoothingIterations; i++)
+		{
+			for (int y = 0; y < terrainData.heightmapResolution; y++)
+			{
+				for (int x = 0; x < terrainData.heightmapResolution; x++)
+				{
+					float avgHeight = currentHeightMap[x, y];
+					List<Vector2> neighbors = GenerateNeighbors(new Vector2(x, y),
+						terrainData.heightmapResolution, terrainData.heightmapResolution);
+
+					foreach (var n in neighbors)
+						avgHeight += currentHeightMap[(int)n.x, (int)n.y];
+					newHeightMap[x, y] = avgHeight / ((float)neighbors.Count + 1);
+				}
+			}
+			currentHeightMap = newHeightMap;
+			smoothProgress++;
+			EditorUtility.DisplayProgressBar("Smoothing Terrain", "Progress",
+				smoothProgress/smoothingIterations);
+		}
+		terrainData.SetHeights(0, 0, newHeightMap);
+		EditorUtility.ClearProgressBar();
 	}
 
 	public void Voronoi()
