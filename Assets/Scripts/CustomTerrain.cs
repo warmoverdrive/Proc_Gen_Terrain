@@ -51,6 +51,14 @@ public class CustomTerrain : MonoBehaviour
 	public float voronoiMaxHeight = 0.9f;
 	public float voronoiFalloff = 0.2f;
 	public float voronoiDropoff = 0.6f;
+	public enum VoronoiType { Linear = 0, Power = 1, Combined = 2, PowerSin = 3 }
+	public VoronoiType voronoiType = VoronoiType.Linear;
+
+	// Midpoint Displacement ------------------------
+	public float MPDHeightMin = -2f;
+	public float MPDHeightMax = 2f;
+	public float MPDHeightDampenerPower = 2.0f;
+	public float MPDRoughness = 2.0f;
 
 	// Terrain Data Objs ----------------------------
 	public Terrain terrain;
@@ -93,23 +101,25 @@ public class CustomTerrain : MonoBehaviour
 				{
 					float distanceToPeak = Vector2.Distance(
 							peakLocation, new Vector2(x, y)) / maxDistance;
-					float h = peak.y - distanceToPeak * voronoiFalloff -
-						Mathf.Pow(distanceToPeak, voronoiDropoff);
+					float h;
+
+					if (voronoiType == VoronoiType.Combined)
+						h = peak.y - distanceToPeak * voronoiFalloff -
+							Mathf.Pow(distanceToPeak, voronoiDropoff);
+
+					else if (voronoiType == VoronoiType.PowerSin)
+						h = peak.y - Mathf.Pow(distanceToPeak * 3, voronoiFalloff) - 
+							(Mathf.Sin(distanceToPeak * 2 * Mathf.PI) / voronoiDropoff);
+
+					else if (voronoiType == VoronoiType.Power)
+						h = peak.y - Mathf.Pow(distanceToPeak, voronoiDropoff) * voronoiFalloff;
+
+					else	// Linear
+						h = peak.y - distanceToPeak * voronoiFalloff;
 
 					// only adjust height if existing point is less than new value
 					if (heightMap[x, y] < h)
 						heightMap[x, y] = h;
-/*					if (!(x == peak.x && y == peak.z))
-					{
-						float distanceToPeak = Vector2.Distance(
-							peakLocation, new Vector2(x, y)) / maxDistance;
-						float h = peak.y - distanceToPeak * voronoiFalloff -
-							Mathf.Pow(distanceToPeak, voronoiDropoff);
-
-						// only adjust height if existing point is less than new value
-						if(heightMap[x,y] < h)
-							heightMap[x, y] = h;
-					}*/
 				}
 			}
 		}
@@ -153,6 +163,98 @@ public class CustomTerrain : MonoBehaviour
 						p.perlinFreqMultiplier) * p.perlinHeightScale;
 				}
 			}
+		}
+		terrainData.SetHeights(0, 0, heightMap);
+	}
+
+	public void MidPointDisplacement()
+	{
+		float[,] heightMap = GetHeightMap();
+		int width = terrainData.heightmapResolution - 1;
+		int squareSize = width;
+		float heightMin = MPDHeightMin;
+		float heightMax = MPDHeightMax;
+		float heightDampener = (float)Mathf.Pow(MPDHeightDampenerPower, -1 * MPDRoughness);
+
+		int cornerX, cornerY;
+		int midX, midY;
+		int pmidXL, pmidXR, pmidYU, pmidYD;
+
+/*	Sets random heights to corners, not super attractive imo
+		heightMap[0, 0] = UnityEngine.Random.Range(0f, 0.2f);
+		heightMap[0, terrainData.heightmapResolution - 2] = UnityEngine.Random.Range(0f, 0.2f);
+		heightMap[terrainData.heightmapResolution - 2, 0] = UnityEngine.Random.Range(0f, 0.2f);
+		heightMap[terrainData.heightmapResolution - 2, terrainData.heightmapResolution - 2] =
+			UnityEngine.Random.Range(0f, 0.2f);
+*/
+
+		while (squareSize > 0)
+		{
+			// Diamond Step
+			for (int x = 0; x < width; x += squareSize)
+			{
+				for (int y = 0; y < width; y += squareSize)
+				{
+					cornerX = x + squareSize;
+					cornerY = y + squareSize;
+
+					// calc halfway points
+					midX = (int)(x + squareSize / 2.0f);
+					midY = (int)(y + squareSize / 2.0f);
+
+					// calculate average
+					heightMap[midX, midY] =
+						(heightMap[x, y] + heightMap[cornerX, y] +
+						heightMap[x, cornerY] + heightMap[cornerX, cornerY]) / 4.0f +
+						UnityEngine.Random.Range(heightMin, heightMax);
+				}
+			}
+			// Square Step
+			for (int x = 0; x < width; x += squareSize)
+			{
+				for (int y = 0; y < width; y += squareSize)
+				{
+					cornerX = (x + squareSize);
+					cornerY = (y + squareSize);
+
+					// calc halfway points
+					midX = (int)(x + squareSize / 2.0f);
+					midY = (int)(y + squareSize / 2.0f);
+
+					// calc square points (midpoints between corners)
+					pmidXR = midX + squareSize;
+					pmidYU = midY + squareSize;
+					pmidXL = midX - squareSize;
+					pmidYD = midY - squareSize;
+
+					if (pmidXL <= 0 || pmidYD <= 0
+						|| pmidXR >= width - 1 || pmidYU >= width - 1) continue;
+
+					// square value for bottom side
+					heightMap[midX, y] = 
+						(heightMap[midX,pmidYD] + heightMap[midX, midY] +
+						heightMap[x,y] + heightMap[cornerX, y]) / 4.0f + 
+						UnityEngine.Random.Range(heightMin, heightMax);
+					// top side
+					heightMap[midX, cornerY] =
+						(heightMap[midX, pmidYU] + heightMap[midX, midY] +
+						heightMap[x, cornerY] + heightMap[cornerX, cornerY]) / 4.0f +
+						UnityEngine.Random.Range(heightMin, heightMax);
+					// left side
+					heightMap[x, midY] =
+						(heightMap[pmidXL, midY] + heightMap[midX, midY] +
+						heightMap[x, cornerY] + heightMap[x, y]) / 4.0f +
+						UnityEngine.Random.Range(heightMin, heightMax);
+					// right side
+					heightMap[cornerX, midY] =
+						(heightMap[pmidXR, midY] + heightMap[midX, midY] +
+						heightMap[cornerX, cornerY] + heightMap[cornerX, y]) / 4.0f +
+						UnityEngine.Random.Range(heightMin, heightMax);
+				}
+			}
+			squareSize = (int)(squareSize / 2.0f);
+			heightMax *= heightDampener;
+			heightMin *= heightDampener;
 		}
 		terrainData.SetHeights(0, 0, heightMap);
 	}

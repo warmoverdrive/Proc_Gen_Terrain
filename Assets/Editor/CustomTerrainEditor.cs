@@ -30,6 +30,12 @@ public class CustomTerrainEditor : Editor
 	SerializedProperty voronoiMaxHeight;
 	SerializedProperty voronoiFalloff;
 	SerializedProperty voronoiDropoff;
+	SerializedProperty voronoiType;
+
+	SerializedProperty MPDHeightMin;
+	SerializedProperty MPDHeightMax;
+	SerializedProperty MPDHeightDampenerPower;
+	SerializedProperty MPDRoughness;
 
 	// fold outs -------------
 	bool showRandom = false;
@@ -37,6 +43,7 @@ public class CustomTerrainEditor : Editor
 	bool showPerlin = false;
 	bool showMultiplePerlin = false;
 	bool showVoronoi = false;
+	bool showMPD = false;
 
 	private void OnEnable()
 	{
@@ -63,6 +70,12 @@ public class CustomTerrainEditor : Editor
 		voronoiMaxHeight = serializedObject.FindProperty("voronoiMaxHeight");
 		voronoiFalloff = serializedObject.FindProperty("voronoiFalloff");
 		voronoiDropoff = serializedObject.FindProperty("voronoiDropoff");
+		voronoiType = serializedObject.FindProperty("voronoiType");
+
+		MPDHeightMin = serializedObject.FindProperty("MPDHeightMin");
+		MPDHeightMax = serializedObject.FindProperty("MPDHeightMax");
+		MPDHeightDampenerPower = serializedObject.FindProperty("MPDHeightDampenerPower");
+		MPDRoughness = serializedObject.FindProperty("MPDRoughness");
 	}
 
 	public override void OnInspectorGUI()
@@ -118,8 +131,22 @@ public class CustomTerrainEditor : Editor
 			EditorGUILayout.Slider(voronoiMaxHeight, 0.0f, 1f, new GUIContent("Maximum Peak Height"));
 			EditorGUILayout.Slider(voronoiFalloff, 0.0f, 10f, new GUIContent("Falloff"));
 			EditorGUILayout.Slider(voronoiDropoff, 0.0f, 10f, new GUIContent("Dropoff"));
+			EditorGUILayout.PropertyField(voronoiType);
 			if (GUILayout.Button("Apply Voronoi"))
 				terrain.Voronoi();
+		}
+
+		showMPD = EditorGUILayout.Foldout(showMPD, "Midpoint Displacement");
+		if(showMPD)
+		{
+			EditorGUILayout.LabelField("", GUI.skin.horizontalSlider);
+			GUILayout.Label("Midpoint Displacement", EditorStyles.boldLabel);
+			EditorGUILayout.Slider(MPDHeightMin, -20f, 0f, new GUIContent("Minimum Height"));
+			EditorGUILayout.Slider(MPDHeightMax, 0f, 20f, new GUIContent("Maximum Height"));
+			EditorGUILayout.Slider(MPDHeightDampenerPower, 0f, 10f, new GUIContent("Dampener Exponent"));
+			EditorGUILayout.Slider(MPDRoughness, 0f, 10f, new GUIContent("Roughness"));
+			if (GUILayout.Button("Run Midpoint Displacement"))
+				terrain.MidPointDisplacement();
 		}
 
 		showRandom = EditorGUILayout.Foldout(showRandom, "Random");
