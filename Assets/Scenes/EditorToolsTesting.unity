@@ -208,7 +208,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 68819517}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 8009.1, y: 1828.7, z: 5641.1}
+  m_LocalPosition: {x: 232.57, y: 185.01, z: 1909}
   m_LocalScale: {x: 1, y: 2, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -290,8 +290,8 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 358401439}
-  m_LocalRotation: {x: -0.12533514, y: -0.6627677, z: 0.11336313, w: -0.72950596}
-  m_LocalPosition: {x: 7997.2188, y: 1838.2913, z: 5631.721}
+  m_LocalRotation: {x: -0.18174611, y: 0.46905664, z: -0.099703655, w: -0.8584949}
+  m_LocalPosition: {x: 1676.3365, y: 692.4907, z: -177.17992}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -330,16 +330,72 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   randomHeightRange: {x: -0.005, y: 0.005}
   heightMapImage: {fileID: 2800000, guid: 64a4cc1cbb69dfe449df7d0dc8ce2772, type: 3}
-  heightMapScale: {x: 2, y: 0.1, z: 2}
+  heightMapScale: {x: 2, y: 0.1, z: 1}
   resetTerrain: 0
-  smoothingIterations: 5
+  smoothingIterations: 1
+  splatheights:
+  - texture: {fileID: 2800000, guid: b3b656cca21f546f699d08c8ee074b8d, type: 3}
+    minHeight: 0
+    maxHeight: 1
+    minSlope: 25
+    maxSlope: 90
+    tileOffset: {x: 0, y: 0}
+    tileSize: {x: 50, y: 50}
+    blendNoiseInputScaler: 0.05
+    blendNoiseMultiplier: 0.2
+    blendOffset: 0.01
+    remove: 0
+  - texture: {fileID: 2800000, guid: dd49ed99f55924d13bacefd240626bc5, type: 3}
+    minHeight: 0.1
+    maxHeight: 0.25
+    minSlope: 0
+    maxSlope: 25
+    tileOffset: {x: 0, y: 0}
+    tileSize: {x: 50, y: 50}
+    blendNoiseInputScaler: 0.01
+    blendNoiseMultiplier: 0.15
+    blendOffset: 0.01
+    remove: 0
+  - texture: {fileID: 2800000, guid: 8b428e4e6cc624a4c9235f69da8e3edb, type: 3}
+    minHeight: 0
+    maxHeight: 0.1
+    minSlope: 0
+    maxSlope: 25
+    tileOffset: {x: 0, y: 0}
+    tileSize: {x: 50, y: 50}
+    blendNoiseInputScaler: 0.1
+    blendNoiseMultiplier: 0.01
+    blendOffset: 0.01
+    remove: 0
+  - texture: {fileID: 2800000, guid: e4cc6b89f7fe0415b99809d203397c20, type: 3}
+    minHeight: 0.25
+    maxHeight: 0.5
+    minSlope: 0
+    maxSlope: 25
+    tileOffset: {x: 0, y: 0}
+    tileSize: {x: 50, y: 50}
+    blendNoiseInputScaler: 0.01
+    blendNoiseMultiplier: 0.01
+    blendOffset: 0.01
+    remove: 0
+  - texture: {fileID: 2800000, guid: de70d1ae446e84ee5aa2ea6a420781e8, type: 3}
+    minHeight: 0.5
+    maxHeight: 1
+    minSlope: 0
+    maxSlope: 35
+    tileOffset: {x: 0, y: 0}
+    tileSize: {x: 50, y: 50}
+    blendNoiseInputScaler: 0.01
+    blendNoiseMultiplier: 0.01
+    blendOffset: 0
+    remove: 0
   perlinXScale: 0.0085
   perlinYScale: 0.004
   perlinOffsetX: 694
   perlinOffsetY: 2718
   perlinOctaves: 10
   perlinPersistance: 0.3
-  perlinHeightScale: 0.097
+  perlinHeightScale: 0.01
   perlinFreqMultiplier: 2.98
   perlinParameters:
   - perlinXScale: 0.02
@@ -369,16 +425,16 @@ MonoBehaviour:
     perlinHeightScale: 0.05
     perlinFreqMultiplier: 5
     remove: 0
-  voronoiPeakCount: 5
-  voronoiMinHeight: 0.057
-  voronoiMaxHeight: 0.224
+  voronoiPeakCount: 2
+  voronoiMinHeight: 0.209
+  voronoiMaxHeight: 0.886
   voronoiFalloff: 5.01
   voronoiDropoff: 10
-  voronoiType: 3
-  MPDHeightMin: -2.2
-  MPDHeightMax: 2
-  MPDHeightDampenerPower: 1.35
-  MPDRoughness: 2.46
+  voronoiType: 2
+  MPDHeightMin: -0.7
+  MPDHeightMax: 1.4
+  MPDHeightDampenerPower: 2.36
+  MPDRoughness: 1.28
   terrain: {fileID: 1267430851}
   terrainData: {fileID: 15600000, guid: a0406e43671b3ac4986b3e79907cab76, type: 2}
 --- !u!154 &1267430850
