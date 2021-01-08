@@ -14,9 +14,11 @@ public class CustomTerrainEditor : Editor
 	SerializedProperty heightMapScale;
 	SerializedProperty heightMapImage;
 
-	SerializedProperty heightMapTexture;
-
 	GUITableState splatMapTable;
+
+	GUITableState vegetationTable;
+	SerializedProperty maxTrees;
+	SerializedProperty treeSpacing;
 
 	SerializedProperty perlinXScale;
 	SerializedProperty perlinYScale;
@@ -50,19 +52,23 @@ public class CustomTerrainEditor : Editor
 	bool showMPD = false;
 	bool showSmooth = false;
 	bool showSplatMaps = false;
+	bool showVegetation = false;
 	bool showHeightMap = false;
 
 	private void OnEnable()
 	{
 		resetTerrain = serializedObject.FindProperty("resetTerrain");
 		smoothingIterations = serializedObject.FindProperty("smoothingIterations");
-		heightMapTexture = serializedObject.FindProperty("heightMapTexture");
 
 		randomHeightRange = serializedObject.FindProperty("randomHeightRange");
 		heightMapScale = serializedObject.FindProperty("heightMapScale");
 		heightMapImage = serializedObject.FindProperty("heightMapImage");
 
 		splatMapTable = new GUITableState("splatMapTable");
+
+		vegetationTable = new GUITableState("vegetationTable");
+		maxTrees = serializedObject.FindProperty("maxTrees");
+		treeSpacing = serializedObject.FindProperty("treeSpacing");
 
 		perlinXScale = serializedObject.FindProperty("perlinXScale");
 		perlinYScale = serializedObject.FindProperty("perlinYScale");
@@ -186,6 +192,25 @@ public class CustomTerrainEditor : Editor
 				terrain.SplatMaps();
 		}
 
+		showVegetation = EditorGUILayout.Foldout(showVegetation, "Vegetation");
+		if (showVegetation)
+		{
+			EditorGUILayout.LabelField("", GUI.skin.horizontalSlider);
+			GUILayout.Label("Vegetation", EditorStyles.boldLabel);
+			EditorGUILayout.IntSlider(maxTrees, 0, 50000, new GUIContent("Maximum Trees"));
+			EditorGUILayout.IntSlider(treeSpacing, 2, 100, new GUIContent("Tree Spacing"));
+			vegetationTable = GUITableLayout.DrawTable(vegetationTable, serializedObject.FindProperty("vegetation"));
+			EditorGUILayout.Space(20);
+			EditorGUILayout.BeginHorizontal();
+			if (GUILayout.Button("+"))
+				terrain.AddNewVegetation();
+			if (GUILayout.Button("-"))
+				terrain.RemoveVegetation();
+			EditorGUILayout.EndHorizontal();
+			if (GUILayout.Button("Apply Vegetation"))
+				terrain.PlantVegetation();
+		}
+
 		showRandom = EditorGUILayout.Foldout(showRandom, "Random");
 		if(showRandom)
 		{
@@ -221,26 +246,8 @@ public class CustomTerrainEditor : Editor
 			GUILayout.Label(terrain.heightMapTexture, GUILayout.Width(wSize), GUILayout.Height(wSize));
 			GUILayout.FlexibleSpace();
 			GUILayout.EndHorizontal();
-			GUILayout.BeginHorizontal();
-			GUILayout.FlexibleSpace();
-			if (GUILayout.Button("Refresh", GUILayout.Width(wSize)))
-				terrain.RefreshHeightMap();
-			GUILayout.FlexibleSpace();
-			GUILayout.EndHorizontal();
 		}
 
 		serializedObject.ApplyModifiedProperties();
-	}
-
-	// Start is called before the first frame update
-	void Start()
-	{
-		
-	}
-
-	// Update is called once per frame
-	void Update()
-	{
-		
 	}
 }

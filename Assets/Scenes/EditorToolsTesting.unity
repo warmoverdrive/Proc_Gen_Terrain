@@ -208,7 +208,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 68819517}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 232.57, y: 185.01, z: 1909}
+  m_LocalPosition: {x: 1708.91, y: 0.94, z: 276.99}
   m_LocalScale: {x: 1, y: 2, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -290,13 +290,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 358401439}
-  m_LocalRotation: {x: -0.18174611, y: 0.46905664, z: -0.099703655, w: -0.8584949}
-  m_LocalPosition: {x: 1676.3365, y: 692.4907, z: -177.17992}
+  m_LocalRotation: {x: -0.023856033, y: -0.35338873, z: 0.015745228, w: -0.93503976}
+  m_LocalPosition: {x: 372.4, y: 43.2, z: 338.3}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 0
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 3.1950002, y: 41.387, z: -0.72200006}
 --- !u!1 &1267430848
 GameObject:
   m_ObjectHideFlags: 0
@@ -309,7 +309,7 @@ GameObject:
   - component: {fileID: 1267430851}
   - component: {fileID: 1267430850}
   - component: {fileID: 1267430849}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Terrain
   m_TagString: Terrain
   m_Icon: {fileID: 0}
@@ -328,16 +328,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ff3da4e8e9a738d4f97cc4903b043714, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  randomHeightRange: {x: -0.005, y: 0.005}
-  heightMapImage: {fileID: 2800000, guid: 64a4cc1cbb69dfe449df7d0dc8ce2772, type: 3}
-  heightMapScale: {x: 2, y: 0.1, z: 1}
+  randomHeightRange: {x: -0.2, y: 0.2}
+  heightMapImage: {fileID: 2800000, guid: 0b3d8eb9a18ac3c4da411e14e51999c2, type: 3}
+  heightMapScale: {x: 1, y: 0.1, z: 1}
   resetTerrain: 0
-  smoothingIterations: 1
+  smoothingIterations: 3
+  heightMapTexture: {fileID: 0}
   splatheights:
   - texture: {fileID: 2800000, guid: b3b656cca21f546f699d08c8ee074b8d, type: 3}
     minHeight: 0
     maxHeight: 1
-    minSlope: 25
+    minSlope: 35
     maxSlope: 90
     tileOffset: {x: 0, y: 0}
     tileSize: {x: 50, y: 50}
@@ -384,11 +385,70 @@ MonoBehaviour:
     minSlope: 0
     maxSlope: 35
     tileOffset: {x: 0, y: 0}
-    tileSize: {x: 50, y: 50}
+    tileSize: {x: 5, y: 5}
     blendNoiseInputScaler: 0.01
     blendNoiseMultiplier: 0.01
     blendOffset: 0
     remove: 0
+  - texture: {fileID: 2800000, guid: 18d06890de62d443ea645cc5adec617e, type: 3}
+    minHeight: 0
+    maxHeight: 0.45
+    minSlope: 15
+    maxSlope: 40
+    tileOffset: {x: 0, y: 0}
+    tileSize: {x: 50, y: 50}
+    blendNoiseInputScaler: 0.01
+    blendNoiseMultiplier: 0.01
+    blendOffset: 0.1
+    remove: 0
+  vegetation:
+  - prefab: {fileID: -927199367670048503, guid: 2a44e858bd119bca11002b7b44295342,
+      type: 3}
+    density: 1
+    minHeight: 0
+    maxHeight: 0.1
+    minSlope: 0
+    maxSlope: 15
+    minHScale: 0.8
+    maxHScale: 2
+    minWScale: 0.8
+    maxWScale: 1.2
+    tint1: {r: 1, g: 1, b: 1, a: 1}
+    tint2: {r: 1, g: 0.91514015, b: 0.48584908, a: 1}
+    lightColor: {r: 1, g: 0.9182694, b: 0.7028302, a: 1}
+    remove: 0
+  - prefab: {fileID: -927199367670048503, guid: 43202a31bd1113061100b7a844295342,
+      type: 3}
+    density: 0.75
+    minHeight: 0.15
+    maxHeight: 0.5
+    minSlope: 0
+    maxSlope: 15
+    minHScale: 0.8
+    maxHScale: 2
+    minWScale: 0.8
+    maxWScale: 1.2
+    tint1: {r: 1, g: 1, b: 1, a: 1}
+    tint2: {r: 1, g: 0.6367924, b: 0.6367924, a: 1}
+    lightColor: {r: 1, g: 0.9389244, b: 0.4481132, a: 1}
+    remove: 0
+  - prefab: {fileID: -927199367670048503, guid: 25fa881dbd110e38a00062d88f962b59,
+      type: 3}
+    density: 0.25
+    minHeight: 0
+    maxHeight: 0.25
+    minSlope: 0
+    maxSlope: 15
+    minHScale: 0.8
+    maxHScale: 2
+    minWScale: 0.8
+    maxWScale: 1.2
+    tint1: {r: 1, g: 1, b: 1, a: 1}
+    tint2: {r: 1, g: 0.85923535, b: 0.7028302, a: 1}
+    lightColor: {r: 1, g: 0.9650926, b: 0.514151, a: 1}
+    remove: 0
+  maxTrees: 50000
+  treeSpacing: 10
   perlinXScale: 0.0085
   perlinYScale: 0.004
   perlinOffsetX: 694
@@ -426,17 +486,18 @@ MonoBehaviour:
     perlinFreqMultiplier: 5
     remove: 0
   voronoiPeakCount: 2
-  voronoiMinHeight: 0.209
-  voronoiMaxHeight: 0.886
-  voronoiFalloff: 5.01
-  voronoiDropoff: 10
-  voronoiType: 2
-  MPDHeightMin: -0.7
-  MPDHeightMax: 1.4
-  MPDHeightDampenerPower: 2.36
-  MPDRoughness: 1.28
+  voronoiMinHeight: 0.134
+  voronoiMaxHeight: 0.644
+  voronoiFalloff: 2.1
+  voronoiDropoff: 3.14
+  voronoiType: 3
+  MPDHeightMin: -0.9
+  MPDHeightMax: 1.1
+  MPDHeightDampenerPower: 1.87
+  MPDRoughness: 1.01
   terrain: {fileID: 1267430851}
   terrainData: {fileID: 15600000, guid: a0406e43671b3ac4986b3e79907cab76, type: 2}
+  terrainLayer: 9
 --- !u!154 &1267430850
 TerrainCollider:
   m_ObjectHideFlags: 0
@@ -459,10 +520,10 @@ Terrain:
   serializedVersion: 6
   m_TerrainData: {fileID: 15600000, guid: a0406e43671b3ac4986b3e79907cab76, type: 2}
   m_TreeDistance: 5000
-  m_TreeBillboardDistance: 50
-  m_TreeCrossFadeLength: 5
-  m_TreeMaximumFullLODCount: 50
-  m_DetailObjectDistance: 80
+  m_TreeBillboardDistance: 345
+  m_TreeCrossFadeLength: 174
+  m_TreeMaximumFullLODCount: 605
+  m_DetailObjectDistance: 250
   m_DetailObjectDensity: 1
   m_HeightmapPixelError: 5
   m_SplatMapDistance: 1000
@@ -580,10 +641,10 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1854123294}
-  m_LocalRotation: {x: 0.40821788, y: -0.23456968, z: 0.10938163, w: 0.8754261}
+  m_LocalRotation: {x: 0.5076717, y: -0.7723117, z: 0.053936776, w: 0.37801442}
   m_LocalPosition: {x: 0, y: 3, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 1
-  m_LocalEulerAnglesHint: {x: 50, y: -30, z: 0}
+  m_LocalEulerAnglesHint: {x: 152.152, y: 36.75699, z: 122.781}
