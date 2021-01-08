@@ -36,4 +36,18 @@ public static class Utils
 		// return relative average
 		return total / maxValue;
 	}
+
+	/// <summary>
+	/// Returns a scaled value from an original range into a new range.
+	/// </summary>
+	/// <param name="value">Value to be scaled</param>
+	/// <param name="originalMin">Floor of the original scale</param>
+	/// <param name="originalMax">Ceiling of the original scale</param>
+	/// <param name="targetMin">Floor of the target scale</param>
+	/// <param name="targetMax">Ceiling of the target scale</param>
+	/// <returns>Returns the scaled value as a float</returns>
+	public static float Map(float value, float originalMin, float originalMax, float targetMin, float targetMax)
+	{
+		return (value - originalMin) * (targetMax - targetMin) / (originalMax - originalMin) + targetMin;
+	}
 }
