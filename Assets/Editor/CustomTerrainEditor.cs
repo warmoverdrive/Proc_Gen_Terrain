@@ -14,6 +14,8 @@ public class CustomTerrainEditor : Editor
 	SerializedProperty heightMapScale;
 	SerializedProperty heightMapImage;
 
+	SerializedProperty heightMapTexture;
+
 	GUITableState splatMapTable;
 
 	SerializedProperty perlinXScale;
@@ -48,11 +50,13 @@ public class CustomTerrainEditor : Editor
 	bool showMPD = false;
 	bool showSmooth = false;
 	bool showSplatMaps = false;
+	bool showHeightMap = false;
 
 	private void OnEnable()
 	{
 		resetTerrain = serializedObject.FindProperty("resetTerrain");
 		smoothingIterations = serializedObject.FindProperty("smoothingIterations");
+		heightMapTexture = serializedObject.FindProperty("heightMapTexture");
 
 		randomHeightRange = serializedObject.FindProperty("randomHeightRange");
 		heightMapScale = serializedObject.FindProperty("heightMapScale");
@@ -206,6 +210,24 @@ public class CustomTerrainEditor : Editor
 		EditorGUILayout.LabelField("", GUI.skin.horizontalSlider);
 		if (GUILayout.Button("Reset Terrain Height"))
 			terrain.ResetTerrainHeight();
+
+		showHeightMap = EditorGUILayout.Foldout(showHeightMap, "Height Map");
+		if (showHeightMap)
+		{
+			EditorGUILayout.LabelField("", GUI.skin.horizontalSlider);
+			int wSize = (int)(EditorGUIUtility.currentViewWidth - 150);
+			GUILayout.BeginHorizontal();
+			GUILayout.FlexibleSpace();
+			GUILayout.Label(terrain.heightMapTexture, GUILayout.Width(wSize), GUILayout.Height(wSize));
+			GUILayout.FlexibleSpace();
+			GUILayout.EndHorizontal();
+			GUILayout.BeginHorizontal();
+			GUILayout.FlexibleSpace();
+			if (GUILayout.Button("Refresh", GUILayout.Width(wSize)))
+				terrain.RefreshHeightMap();
+			GUILayout.FlexibleSpace();
+			GUILayout.EndHorizontal();
+		}
 
 		serializedObject.ApplyModifiedProperties();
 	}

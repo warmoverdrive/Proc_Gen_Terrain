@@ -15,6 +15,7 @@ public class CustomTerrain : MonoBehaviour
 
 	public bool resetTerrain = true;
 	public int smoothingIterations = 1;
+	public RenderTexture heightMapTexture;
 
 	// Splatmaps ------------------------------------
 	[System.Serializable]
@@ -86,6 +87,8 @@ public class CustomTerrain : MonoBehaviour
 	// Terrain Data Objs ----------------------------
 	public Terrain terrain;
 	public TerrainData terrainData;
+
+	public void RefreshHeightMap() => heightMapTexture = terrainData.heightmapTexture;
 
 	public void AddNewSplatHeight()
 	{
@@ -247,6 +250,7 @@ public class CustomTerrain : MonoBehaviour
 		}
 		terrainData.SetHeights(0, 0, newHeightMap);
 		EditorUtility.ClearProgressBar();
+		RefreshHeightMap();
 	}
 
 	public void Voronoi()
@@ -298,6 +302,7 @@ public class CustomTerrain : MonoBehaviour
 		}
 
 		terrainData.SetHeights(0, 0, heightMap);
+		RefreshHeightMap();
 	}
 
 	public void Perlin()
@@ -317,6 +322,7 @@ public class CustomTerrain : MonoBehaviour
 			}
 		}
 		terrainData.SetHeights(0, 0, heightMap);
+		RefreshHeightMap();
 	}
 
 	public void MultiplePerlinTerrain()
@@ -338,6 +344,7 @@ public class CustomTerrain : MonoBehaviour
 			}
 		}
 		terrainData.SetHeights(0, 0, heightMap);
+		RefreshHeightMap();
 	}
 
 	public void MidPointDisplacement()
@@ -430,6 +437,7 @@ public class CustomTerrain : MonoBehaviour
 			heightMin *= heightDampener;
 		}
 		terrainData.SetHeights(0, 0, heightMap);
+		RefreshHeightMap();
 	}
 
 	public void RandomTerrain()
@@ -444,6 +452,7 @@ public class CustomTerrain : MonoBehaviour
 			}
 		}
 		terrainData.SetHeights(0, 0, heightMap);
+		RefreshHeightMap();
 	}
 
 	public void LoadHeightMapTexture()
@@ -459,6 +468,7 @@ public class CustomTerrain : MonoBehaviour
 			}
 		}
 		terrainData.SetHeights(0, 0, heightMap);
+		RefreshHeightMap();
 	}
 
 	public void ResetTerrainHeight()
@@ -474,6 +484,7 @@ public class CustomTerrain : MonoBehaviour
 			}
 		}
 		terrainData.SetHeights(0, 0, heightMap);
+		RefreshHeightMap();
 	}
 
 	public void AddNewPerlin() => perlinParameters.Add(new PerlinParameters());
@@ -533,13 +544,4 @@ public class CustomTerrain : MonoBehaviour
 		}
 	}
 
-	void Start()
-	{
-		
-	}
-
-	void Update()
-	{
-		
-	}
 }
