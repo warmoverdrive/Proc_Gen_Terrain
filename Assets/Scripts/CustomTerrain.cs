@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
 using System.Linq;
+using UnityEngine.SceneManagement;
+using UnityEngine.Windows;
 
 [ExecuteInEditMode]
 
@@ -34,10 +36,8 @@ public class CustomTerrain : MonoBehaviour
 		public bool remove = false;
 	}
 
-	public List<SplatHeights> splatheights = new List<SplatHeights>()
-	{
-		new SplatHeights()
-	};
+	public List<SplatHeights> splatheights = new List<SplatHeights>() { new SplatHeights() };
+	string terrainLayerFolderName = "TerrainLayers (Generated)";
 
 	// Vegetation -----------------------------------
 	[System.Serializable]
@@ -59,15 +59,29 @@ public class CustomTerrain : MonoBehaviour
 		public bool remove = false;
 	}
 
-	public List<Vegetation> vegetation = new List<Vegetation>()
-	{
-		new Vegetation()
-	};
-
+	public List<Vegetation> vegetation = new List<Vegetation>() { new Vegetation() };
 	public int maxTrees = 5000;
 	public int treeSpacing = 5;
 
 	// Detail ---------------------------------------
+	[System.Serializable]
+	public class Detail
+	{
+		public GameObject prototype = null;
+		public Texture2D prototypeTexture = null;
+		public float density = 0.5f;
+		public float minHeight = 0.1f;
+		public float maxHeight = 0.2f;
+		public float minSlope = 0;
+		public float maxSlope = 15;
+		public float overlap = 0.1f;
+		public float feather = 0.05f;
+		public bool remove = false;
+	}
+
+	public List<Detail> details = new List<Detail>() { new Detail() };
+	public int maxDetails = 5000;
+	public int detailSpacing = 5;
 
 	// Perlin Noise ---------------------------------
 	public float perlinXScale = 0.01f;
@@ -94,10 +108,7 @@ public class CustomTerrain : MonoBehaviour
 		public bool remove = false;
 	}
 
-	public List<PerlinParameters> perlinParameters = new List<PerlinParameters>()
-	{
-		new PerlinParameters()
-	};
+	public List<PerlinParameters> perlinParameters = new List<PerlinParameters>() { new PerlinParameters() };
 
 	// Voronoi --------------------------------------
 	public int voronoiPeakCount = 4;
@@ -210,32 +221,101 @@ public class CustomTerrain : MonoBehaviour
 	{
 		List<Vegetation> keptVegitation = new List<Vegetation>();
 		for (int i = 0; i < vegetation.Count; i++)
-		{
 			if (!vegetation[i].remove)
 				keptVegitation.Add(vegetation[i]);
-		}
 		if (keptVegitation.Count == 0)    // make sure there is always one Vegetation for GUI
 			keptVegitation.Add(vegetation[0]);
 		vegetation = keptVegitation;
 	}
 
-	public void AddNewSplatHeight() => splatheights.Add(new SplatHeights());
-
-	public void RemoveSplatHeight()
+	public void ApplyDetails()
 	{
-		List<SplatHeights> keptSplatHeights = new List<SplatHeights>();
-		for (int i = 0; i < splatheights.Count; i++)
+
+		DetailPrototype[] newDetailPrototypes;
+		newDetailPrototypes = new DetailPrototype[details.Count];
+		int dIndex = 0;
+
+		foreach (Detail d in details)
 		{
-			if (!splatheights[i].remove)
-				keptSplatHeights.Add(splatheights[i]);
+			newDetailPrototypes[dIndex] = new DetailPrototype();
+			newDetailPrototypes[dIndex].prototype = d.prototype;
+			newDetailPrototypes[dIndex].prototypeTexture = d.prototypeTexture;
+			newDetailPrototypes[dIndex].healthyColor = Color.white;
+			if(newDetailPrototypes[dIndex].prototype)
+			{
+				newDetailPrototypes[dIndex].usePrototypeMesh = true;
+				newDetailPrototypes[dIndex].renderMode = DetailRenderMode.VertexLit;
+			}
+			else
+			{
+				newDetailPrototypes[dIndex].usePrototypeMesh = false;
+				newDetailPrototypes[dIndex].renderMode = DetailRenderMode.GrassBillboard;
+			}
+			dIndex++;
 		}
-		if (keptSplatHeights.Count == 0)	// make sure there is always one SplatHeight for GUI
-			keptSplatHeights.Add(splatheights[0]);
-		splatheights = keptSplatHeights;
+		terrainData.detailPrototypes = newDetailPrototypes;
+
+		float[,] heightMap = terrainData.GetHeights(0, 0, terrainData.heightmapResolution, terrainData.heightmapResolution);
+
+		for (int i = 0; i < terrainData.detailPrototypes.Length; i++)
+		{
+			int[,] detailMap = new int[terrainData.detailWidth, terrainData.detailHeight];
+
+			for (int y = 0; y < terrainData.detailHeight; y += detailSpacing)
+				for (int x = 0; x < terrainData.detailWidth; x += detailSpacing)
+				{
+					if (UnityEngine.Random.Range(0.0f, 1.0f) > details[i].density) 
+						continue;
+					int xHM = (int)((x / (float)terrainData.detailWidth) * terrainData.heightmapResolution);
+					int yHM = (int)((y / (float)terrainData.detailHeight) * terrainData.heightmapResolution);
+					int xWU = (int)(x / (float)terrainData.detailWidth * terrainData.size.x);
+					int zWU = (int)(y / (float)terrainData.detailHeight * terrainData.size.z);
+
+					float thisNoise = Utils.Map(Mathf.PerlinNoise(
+						x * details[i].feather,
+						y * details[i].feather),
+						0, 1, 0.5f, 1);
+
+					float convertedMinHeight = details[i].minHeight * thisNoise -
+						details[i].overlap * thisNoise;
+
+					float convertedMaxHeight = details[i].maxHeight * thisNoise +
+						details[i].overlap * thisNoise;
+
+					float thisHeight = heightMap[yHM, xHM];
+
+					float steepness = terrainData.GetSteepness(
+						(xWU + thisNoise) / (float)terrainData.size.x,
+						(zWU + thisNoise) / (float)terrainData.size.z);
+
+					if ((thisHeight >= convertedMinHeight && thisHeight <= convertedMaxHeight) &&
+						(steepness >= details[i].minSlope && steepness <= details[i].maxSlope))
+					detailMap[y, x] = 1;
+				}
+			terrainData.SetDetailLayer(0, 0, i, detailMap);
+		}
+	}
+
+	public void AddNewDetail() => details.Add(new Detail());
+
+	public void RemoveDetail()
+	{
+		List<Detail> keptDetails = new List<Detail>();
+		for (int i = 0; i < details.Count; i++)
+			if (!details[i].remove)
+				keptDetails.Add(details[i]);
+		if (keptDetails.Count == 0)
+			keptDetails.Add(new Detail());
+		details = keptDetails;
 	}
 
 	public void SplatMaps()
 	{
+		// Make sure we have a folder to dump terrain layer data
+		string generatedTerrainLayerPath = "Assets/" + terrainLayerFolderName;
+		if (!AssetDatabase.IsValidFolder(generatedTerrainLayerPath))
+			AssetDatabase.CreateFolder("Assets", terrainLayerFolderName);
+
 		TerrainLayer[] newSplatPrototypes;
 		newSplatPrototypes = new TerrainLayer[splatheights.Count];
 		int spIndex = 0;
@@ -246,6 +326,9 @@ public class CustomTerrain : MonoBehaviour
 			newSplatPrototypes[spIndex].tileOffset = sh.tileOffset;
 			newSplatPrototypes[spIndex].tileSize = sh.tileSize;
 			newSplatPrototypes[spIndex].diffuseTexture.Apply(true);
+			string path = 
+				generatedTerrainLayerPath + "Scene_" + SceneManager.GetActiveScene().name + "_" + spIndex + ".terrainlayer";
+			AssetDatabase.CreateAsset(newSplatPrototypes[spIndex], path);
 			spIndex++;
 		}
 		terrainData.terrainLayers = newSplatPrototypes;
@@ -264,8 +347,8 @@ public class CustomTerrain : MonoBehaviour
 				float[] splat = new float[terrainData.alphamapLayers];
 				for (int i = 0; i < splatheights.Count; i++)
 				{
-					float noise = 
-						Mathf.PerlinNoise(x * splatheights[i].blendNoiseInputScaler, y * splatheights[i].blendNoiseInputScaler) * 
+					float noise =
+						Mathf.PerlinNoise(x * splatheights[i].blendNoiseInputScaler, y * splatheights[i].blendNoiseInputScaler) *
 						splatheights[i].blendNoiseMultiplier;
 					float offset = splatheights[i].blendOffset + noise;
 					float thisHeightStart = splatheights[i].minHeight - offset;
@@ -285,6 +368,19 @@ public class CustomTerrain : MonoBehaviour
 			}
 		}
 		terrainData.SetAlphamaps(0, 0, splatmapData);
+	}
+
+	public void AddNewSplatHeight() => splatheights.Add(new SplatHeights());
+
+	public void RemoveSplatHeight()
+	{
+		List<SplatHeights> keptSplatHeights = new List<SplatHeights>();
+		for (int i = 0; i < splatheights.Count; i++)
+			if (!splatheights[i].remove)
+				keptSplatHeights.Add(splatheights[i]);
+		if (keptSplatHeights.Count == 0)	// make sure there is always one SplatHeight for GUI
+			keptSplatHeights.Add(splatheights[0]);
+		splatheights = keptSplatHeights;
 	}
 
 	void NormalizeVector(float[] v)

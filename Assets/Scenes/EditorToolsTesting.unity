@@ -449,6 +449,60 @@ MonoBehaviour:
     remove: 0
   maxTrees: 50000
   treeSpacing: 10
+  details:
+  - prototype: {fileID: -927199367670048503, guid: 8e41f14c6552d48e6a7992aaecc808e4,
+      type: 3}
+    prototypeTexture: {fileID: 0}
+    density: 0.001
+    minHeight: 0.23
+    maxHeight: 1
+    minSlope: 0
+    maxSlope: 15
+    overlap: 0.1
+    feather: 0.5
+    remove: 0
+  - prototype: {fileID: 0}
+    prototypeTexture: {fileID: 2800000, guid: bf5ddf96bd116869a000fb488f962b59, type: 3}
+    density: 1
+    minHeight: 0.15
+    maxHeight: 0.45
+    minSlope: 0
+    maxSlope: 20
+    overlap: 0.01
+    feather: 0.01
+    remove: 0
+  - prototype: {fileID: 0}
+    prototypeTexture: {fileID: 2800000, guid: 4c3440f2bd11488b1100df5944295342, type: 3}
+    density: 1
+    minHeight: 0
+    maxHeight: 0.35
+    minSlope: 0
+    maxSlope: 20
+    overlap: 0.01
+    feather: 0.01
+    remove: 0
+  - prototype: {fileID: 0}
+    prototypeTexture: {fileID: 2800000, guid: a65d3373cd11cd72a00009188f962b59, type: 3}
+    density: 1
+    minHeight: 0.15
+    maxHeight: 0.45
+    minSlope: 0
+    maxSlope: 20
+    overlap: 0.1
+    feather: 0.05
+    remove: 0
+  - prototype: {fileID: 0}
+    prototypeTexture: {fileID: 2800000, guid: a9302d63bd11830a1100b7fa44295342, type: 3}
+    density: 1
+    minHeight: 0
+    maxHeight: 0.2
+    minSlope: 0
+    maxSlope: 20
+    overlap: 0.1
+    feather: 0.05
+    remove: 0
+  maxDetails: 2355
+  detailSpacing: 1
   perlinXScale: 0.0085
   perlinYScale: 0.004
   perlinOffsetX: 694
@@ -520,10 +574,10 @@ Terrain:
   serializedVersion: 6
   m_TerrainData: {fileID: 15600000, guid: a0406e43671b3ac4986b3e79907cab76, type: 2}
   m_TreeDistance: 5000
-  m_TreeBillboardDistance: 345
+  m_TreeBillboardDistance: 745
   m_TreeCrossFadeLength: 174
-  m_TreeMaximumFullLODCount: 605
-  m_DetailObjectDistance: 250
+  m_TreeMaximumFullLODCount: 1852
+  m_DetailObjectDistance: 2355
   m_DetailObjectDensity: 1
   m_HeightmapPixelError: 5
   m_SplatMapDistance: 1000
@@ -594,9 +648,9 @@ Light:
     m_Type: 2
     m_Resolution: -1
     m_CustomResolution: -1
-    m_Strength: 1
-    m_Bias: 0.05
-    m_NormalBias: 0.4
+    m_Strength: 0.574
+    m_Bias: 0.94
+    m_NormalBias: 0.26
     m_NearPlane: 0.2
     m_CullingMatrixOverride:
       e00: 1
@@ -641,10 +695,10 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1854123294}
-  m_LocalRotation: {x: 0.5076717, y: -0.7723117, z: 0.053936776, w: 0.37801442}
+  m_LocalRotation: {x: 0.5264435, y: -0.7079059, z: 0.18655585, w: 0.43234652}
   m_LocalPosition: {x: 0, y: 3, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 1
-  m_LocalEulerAnglesHint: {x: 152.152, y: 36.75699, z: 122.781}
+  m_LocalEulerAnglesHint: {x: 134, y: 36.75699, z: 122.781}
