@@ -332,7 +332,7 @@ MonoBehaviour:
   heightMapImage: {fileID: 2800000, guid: 0b3d8eb9a18ac3c4da411e14e51999c2, type: 3}
   heightMapScale: {x: 1, y: 0.1, z: 1}
   resetTerrain: 0
-  smoothingIterations: 3
+  smoothingIterations: 1
   heightMapTexture: {fileID: 0}
   splatheights:
   - texture: {fileID: 2800000, guid: b3b656cca21f546f699d08c8ee074b8d, type: 3}
@@ -350,9 +350,9 @@ MonoBehaviour:
     minHeight: 0.1
     maxHeight: 0.25
     minSlope: 0
-    maxSlope: 25
+    maxSlope: 30
     tileOffset: {x: 0, y: 0}
-    tileSize: {x: 50, y: 50}
+    tileSize: {x: 5, y: 5}
     blendNoiseInputScaler: 0.01
     blendNoiseMultiplier: 0.15
     blendOffset: 0.01
@@ -363,7 +363,7 @@ MonoBehaviour:
     minSlope: 0
     maxSlope: 25
     tileOffset: {x: 0, y: 0}
-    tileSize: {x: 50, y: 50}
+    tileSize: {x: 5, y: 5}
     blendNoiseInputScaler: 0.1
     blendNoiseMultiplier: 0.01
     blendOffset: 0.01
@@ -374,7 +374,7 @@ MonoBehaviour:
     minSlope: 0
     maxSlope: 25
     tileOffset: {x: 0, y: 0}
-    tileSize: {x: 50, y: 50}
+    tileSize: {x: 5, y: 5}
     blendNoiseInputScaler: 0.01
     blendNoiseMultiplier: 0.01
     blendOffset: 0.01
@@ -393,10 +393,10 @@ MonoBehaviour:
   - texture: {fileID: 2800000, guid: 18d06890de62d443ea645cc5adec617e, type: 3}
     minHeight: 0
     maxHeight: 0.45
-    minSlope: 15
-    maxSlope: 40
+    minSlope: 20
+    maxSlope: 35
     tileOffset: {x: 0, y: 0}
-    tileSize: {x: 50, y: 50}
+    tileSize: {x: 5, y: 5}
     blendNoiseInputScaler: 0.01
     blendNoiseMultiplier: 0.01
     blendOffset: 0.1
@@ -404,7 +404,7 @@ MonoBehaviour:
   vegetation:
   - prefab: {fileID: -927199367670048503, guid: 2a44e858bd119bca11002b7b44295342,
       type: 3}
-    density: 1
+    density: 0.15
     minHeight: 0
     maxHeight: 0.1
     minSlope: 0
@@ -419,7 +419,7 @@ MonoBehaviour:
     remove: 0
   - prefab: {fileID: -927199367670048503, guid: 43202a31bd1113061100b7a844295342,
       type: 3}
-    density: 0.75
+    density: 1
     minHeight: 0.15
     maxHeight: 0.5
     minSlope: 0
@@ -434,7 +434,7 @@ MonoBehaviour:
     remove: 0
   - prefab: {fileID: -927199367670048503, guid: 25fa881dbd110e38a00062d88f962b59,
       type: 3}
-    density: 0.25
+    density: 0.1
     minHeight: 0
     maxHeight: 0.25
     minSlope: 0
@@ -458,50 +458,96 @@ MonoBehaviour:
     maxHeight: 1
     minSlope: 0
     maxSlope: 15
+    bendFactor: 1
+    dryColor: {r: 1, g: 1, b: 1, a: 1}
+    healthyColor: {r: 1, g: 1, b: 1, a: 1}
+    widthRange: {x: 0.95, y: 1.1}
+    heightRange: {x: 0.95, y: 1.1}
+    noiseSpread: 1
     overlap: 0.1
     feather: 0.5
     remove: 0
   - prototype: {fileID: 0}
     prototypeTexture: {fileID: 2800000, guid: bf5ddf96bd116869a000fb488f962b59, type: 3}
-    density: 1
+    density: 0.75
     minHeight: 0.15
     maxHeight: 0.45
     minSlope: 0
     maxSlope: 20
-    overlap: 0.01
-    feather: 0.01
+    bendFactor: 1
+    dryColor: {r: 1, g: 0.6767367, b: 0.3726415, a: 1}
+    healthyColor: {r: 1, g: 1, b: 1, a: 1}
+    widthRange: {x: 1, y: 2}
+    heightRange: {x: 1, y: 2}
+    noiseSpread: 0.01
+    overlap: 0.1
+    feather: 0.1
     remove: 0
   - prototype: {fileID: 0}
     prototypeTexture: {fileID: 2800000, guid: 4c3440f2bd11488b1100df5944295342, type: 3}
     density: 1
-    minHeight: 0
+    minHeight: 0.05
     maxHeight: 0.35
     minSlope: 0
-    maxSlope: 20
-    overlap: 0.01
-    feather: 0.01
+    maxSlope: 25
+    bendFactor: 1
+    dryColor: {r: 1, g: 0.6308222, b: 0.37254906, a: 1}
+    healthyColor: {r: 1, g: 1, b: 1, a: 1}
+    widthRange: {x: 1, y: 2}
+    heightRange: {x: 1, y: 2}
+    noiseSpread: 0.05
+    overlap: 0.1
+    feather: 0.1
     remove: 0
   - prototype: {fileID: 0}
     prototypeTexture: {fileID: 2800000, guid: a65d3373cd11cd72a00009188f962b59, type: 3}
-    density: 1
-    minHeight: 0.15
-    maxHeight: 0.45
-    minSlope: 0
-    maxSlope: 20
-    overlap: 0.1
-    feather: 0.05
-    remove: 0
-  - prototype: {fileID: 0}
-    prototypeTexture: {fileID: 2800000, guid: a9302d63bd11830a1100b7fa44295342, type: 3}
-    density: 1
+    density: 0.75
     minHeight: 0
     maxHeight: 0.2
     minSlope: 0
     maxSlope: 20
+    bendFactor: 1
+    dryColor: {r: 1, g: 0.80459976, b: 0.37254906, a: 1}
+    healthyColor: {r: 0.56289315, g: 1, b: 0.3443396, a: 1}
+    widthRange: {x: 2, y: 4}
+    heightRange: {x: 1, y: 2}
+    noiseSpread: 0.1
+    overlap: 0.1
+    feather: 0.1
+    remove: 0
+  - prototype: {fileID: 0}
+    prototypeTexture: {fileID: 2800000, guid: a9302d63bd11830a1100b7fa44295342, type: 3}
+    density: 1
+    minHeight: 0.1
+    maxHeight: 0.3
+    minSlope: 0
+    maxSlope: 20
+    bendFactor: 1
+    dryColor: {r: 1, g: 0.9372062, b: 0.37254906, a: 1}
+    healthyColor: {r: 1, g: 1, b: 1, a: 1}
+    widthRange: {x: 1, y: 2}
+    heightRange: {x: 1, y: 2}
+    noiseSpread: 0.05
+    overlap: 0.1
+    feather: 0.1
+    remove: 0
+  - prototype: {fileID: 0}
+    prototypeTexture: {fileID: 2800000, guid: 54d49d60bd11c48b1100454844295342, type: 3}
+    density: 0.25
+    minHeight: 0.2
+    maxHeight: 0.25
+    minSlope: 0
+    maxSlope: 10
+    bendFactor: 1
+    dryColor: {r: 0.44284147, g: 0.3915094, b: 1, a: 1}
+    healthyColor: {r: 0.8490566, g: 0.19624422, b: 0.72671247, a: 1}
+    widthRange: {x: 1, y: 2}
+    heightRange: {x: 2, y: 3}
+    noiseSpread: 0.01
     overlap: 0.1
     feather: 0.05
     remove: 0
-  maxDetails: 2355
+  maxDetails: 1425
   detailSpacing: 1
   perlinXScale: 0.0085
   perlinYScale: 0.004
@@ -577,7 +623,7 @@ Terrain:
   m_TreeBillboardDistance: 745
   m_TreeCrossFadeLength: 174
   m_TreeMaximumFullLODCount: 1852
-  m_DetailObjectDistance: 2355
+  m_DetailObjectDistance: 1425
   m_DetailObjectDensity: 1
   m_HeightmapPixelError: 5
   m_SplatMapDistance: 1000

@@ -74,6 +74,12 @@ public class CustomTerrain : MonoBehaviour
 		public float maxHeight = 0.2f;
 		public float minSlope = 0;
 		public float maxSlope = 15;
+		public float bendFactor = 1;
+		public Color dryColor = Color.white;
+		public Color healthyColor = Color.white;
+		public Vector2 widthRange = new Vector2(0.95f, 1.1f);
+		public Vector2 heightRange = new Vector2(0.95f, 1.1f);
+		public float noiseSpread = 1f;
 		public float overlap = 0.1f;
 		public float feather = 0.05f;
 		public bool remove = false;
@@ -240,8 +246,15 @@ public class CustomTerrain : MonoBehaviour
 			newDetailPrototypes[dIndex] = new DetailPrototype();
 			newDetailPrototypes[dIndex].prototype = d.prototype;
 			newDetailPrototypes[dIndex].prototypeTexture = d.prototypeTexture;
-			newDetailPrototypes[dIndex].healthyColor = Color.white;
-			if(newDetailPrototypes[dIndex].prototype)
+			newDetailPrototypes[dIndex].healthyColor = d.healthyColor;
+			newDetailPrototypes[dIndex].dryColor = d.dryColor;
+			newDetailPrototypes[dIndex].minWidth = d.widthRange.x;
+			newDetailPrototypes[dIndex].maxWidth = d.widthRange.y;
+			newDetailPrototypes[dIndex].minHeight = d.heightRange.x;
+			newDetailPrototypes[dIndex].minHeight = d.heightRange.y;
+			newDetailPrototypes[dIndex].bendFactor = d.bendFactor;
+			newDetailPrototypes[dIndex].noiseSpread = d.noiseSpread;
+			if (newDetailPrototypes[dIndex].prototype)
 			{
 				newDetailPrototypes[dIndex].usePrototypeMesh = true;
 				newDetailPrototypes[dIndex].renderMode = DetailRenderMode.VertexLit;
