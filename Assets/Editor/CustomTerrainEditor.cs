@@ -14,6 +14,10 @@ public class CustomTerrainEditor : Editor
 	SerializedProperty heightMapScale;
 	SerializedProperty heightMapImage;
 
+	SerializedProperty waterHeight;
+	SerializedProperty waterObject;
+	SerializedProperty shorelineMaterial;
+
 	GUITableState splatMapTable;
 
 	GUITableState vegetationTable;
@@ -58,6 +62,7 @@ public class CustomTerrainEditor : Editor
 	bool showSplatMaps = false;
 	bool showVegetation = false;
 	bool showDetails = false;
+	bool showWater = false;
 	bool showHeightMap = false;
 
 	private void OnEnable()
@@ -68,6 +73,10 @@ public class CustomTerrainEditor : Editor
 		randomHeightRange = serializedObject.FindProperty("randomHeightRange");
 		heightMapScale = serializedObject.FindProperty("heightMapScale");
 		heightMapImage = serializedObject.FindProperty("heightMapImage");
+
+		waterHeight = serializedObject.FindProperty("waterHeight");
+		waterObject = serializedObject.FindProperty("waterObject");
+		shorelineMaterial = serializedObject.FindProperty("shorelineMaterial");
 
 		splatMapTable = new GUITableState("splatMapTable");
 
@@ -140,7 +149,7 @@ public class CustomTerrainEditor : Editor
 			EditorGUILayout.IntSlider(perlinOffsetY, 0, 10000, new GUIContent("Y Offset"));
 			EditorGUILayout.IntSlider(perlinOctaves, 1, 10, new GUIContent("Octaves"));
 			EditorGUILayout.Slider(perlinPersistance, 0f, 1f, new GUIContent("Persistance"));
-			EditorGUILayout.Slider(perlinHeightScale, 0, 1, new GUIContent("Height Scale"));
+			EditorGUILayout.Slider(perlinHeightScale, -1, 1, new GUIContent("Height Scale"));
 			EditorGUILayout.Slider(perlinFreqMultiplier, 1, 5, new GUIContent("Freqency Multiplier"));
 			if (GUILayout.Button("Generate and Apply Perlin Heights"))
 				terrain.Perlin();
@@ -238,6 +247,24 @@ public class CustomTerrainEditor : Editor
 			EditorGUILayout.EndHorizontal();
 			if (GUILayout.Button("Apply Details"))
 				terrain.ApplyDetails();
+		}
+
+		showWater = EditorGUILayout.Foldout(showWater, "Water");
+		if (showWater)
+		{
+			EditorGUILayout.LabelField("", GUI.skin.horizontalSlider);
+			GUILayout.Label("Water", EditorStyles.boldLabel);
+			EditorGUILayout.Slider(waterHeight, 0f, 1f, new GUIContent("Water Height"));
+			EditorGUILayout.PropertyField(waterObject);
+			if (GUILayout.Button("Add Water"))
+				terrain.AddWater();
+			if (GUILayout.Button("Remove Water"))
+				terrain.RemoveWater();
+			EditorGUILayout.PropertyField(shorelineMaterial);
+			if (GUILayout.Button("Draw Shoreline"))
+				terrain.DrawShoreline();
+			if (GUILayout.Button("Remove Shoreline"))
+				terrain.RemoveShoreline();
 		}
 
 		showRandom = EditorGUILayout.Foldout(showRandom, "Random");
