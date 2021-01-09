@@ -24,6 +24,17 @@ public class CustomTerrain : MonoBehaviour
 	public GameObject waterObject;
 	public Material shorelineMaterial;
 
+	// Erosion --------------------------------------
+	public enum ErosionType { 
+		Rain = 0, Thermal = 1, Tidal = 2,
+		River = 3, Wind = 4 }
+	public ErosionType erosionType = ErosionType.Rain;
+	public float erosionStrength = 0.1f;
+	public int springsPerRiver = 5;
+	public float solubility = 0.01f;
+	public int droplets = 10;
+	public int erosionSmoothAmount = 5;
+
 	// Splatmaps ------------------------------------
 	[System.Serializable]
 	public class SplatHeights
@@ -142,6 +153,44 @@ public class CustomTerrain : MonoBehaviour
 
 	public void RefreshHeightMap() => heightMapTexture = terrainData.heightmapTexture;
 
+	public void Erode()
+	{
+		if (erosionType == ErosionType.Rain)
+			Rain();
+		else if (erosionType == ErosionType.Tidal)
+			Tidal();
+		else if (erosionType == ErosionType.Thermal)
+			Thermal();
+		else if (erosionType == ErosionType.River)
+			River();
+		else
+			Wind();
+
+		Smooth(erosionSmoothAmount);
+				
+	}
+
+	public void Rain() 
+	{
+		float[,] heightMap = terrainData.GetHeights(0, 0,
+			terrainData.heightmapResolution, terrainData.heightmapResolution);
+
+		for (int drop = 0; drop < droplets; drop++)
+		{
+			int randX = UnityEngine.Random.Range(0, terrainData.heightmapResolution);
+			int randY = UnityEngine.Random.Range(0, terrainData.heightmapResolution);
+
+			heightMap[randX, randY] -= erosionStrength;
+		}
+
+		terrainData.SetHeights(0, 0, heightMap);
+	}
+	public void Tidal() { }
+	public void Thermal() { }
+	public void River() { }
+	public void Wind() { }
+
+
 	public void AddWater()
 	{
 		GameObject water = GameObject.Find("water");
@@ -212,7 +261,7 @@ public class CustomTerrain : MonoBehaviour
 		{
 			combine[i].mesh = meshFilters[i].sharedMesh;
 			combine[i].transform = meshFilters[i].transform.localToWorldMatrix;
-			meshFilters[i].gameObject.active = false;	// can not combine meshes that are active
+			meshFilters[i].gameObject.SetActive(false);	// can not combine meshes that are active
 			i++;
 		}
 
@@ -543,7 +592,7 @@ public class CustomTerrain : MonoBehaviour
 		return neighbors;
 	}
 
-	public void Smooth()
+	public void Smooth(int iterations)
 	{
 		float[,] currentHeightMap = terrainData.GetHeights(0, 0, 
 			terrainData.heightmapResolution, terrainData.heightmapResolution);
@@ -552,7 +601,7 @@ public class CustomTerrain : MonoBehaviour
 		EditorUtility.DisplayProgressBar("Smoothing Terrain", "Progress",
 			smoothProgress);
 
-		for (int i = 0; i < smoothingIterations; i++)
+		for (int i = 0; i < iterations; i++)
 		{
 			for (int y = 0; y < terrainData.heightmapResolution; y++)
 			{
