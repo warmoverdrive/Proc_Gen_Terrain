@@ -30,9 +30,12 @@ public class CustomTerrain : MonoBehaviour
 		River = 3, Wind = 4 }
 	public ErosionType erosionType = ErosionType.Rain;
 	public float erosionStrength = 0.1f;
+	public float erosionAmount = 0.01f;
 	public int springsPerRiver = 5;
 	public float solubility = 0.01f;
 	public int droplets = 10;
+	public float windDirection = 15;
+	public int erosionIterations = 5;
 	public int erosionSmoothAmount = 5;
 
 	// Splatmaps ------------------------------------
@@ -155,17 +158,26 @@ public class CustomTerrain : MonoBehaviour
 
 	public void Erode()
 	{
-		if (erosionType == ErosionType.Rain)
-			Rain();
-		else if (erosionType == ErosionType.Tidal)
-			Tidal();
-		else if (erosionType == ErosionType.Thermal)
-			Thermal();
-		else if (erosionType == ErosionType.River)
-			River();
-		else
-			Wind();
-
+		float erosionProgress = 0;
+		EditorUtility.DisplayProgressBar("Eroding Terrain", "working...",
+			erosionProgress);
+		for (int i = 0; i < erosionIterations; i++)
+		{
+			if (erosionType == ErosionType.Rain)
+				Rain();
+			else if (erosionType == ErosionType.Tidal)
+				Tidal();
+			else if (erosionType == ErosionType.Thermal)
+				Thermal();
+			else if (erosionType == ErosionType.River)
+				River();
+			else
+				Wind();
+			erosionProgress++;
+			EditorUtility.DisplayProgressBar("Eroding Terrain", "working...",
+				erosionProgress / erosionIterations);
+		}
+		EditorUtility.ClearProgressBar();
 		Smooth(erosionSmoothAmount);
 				
 	}
@@ -185,11 +197,142 @@ public class CustomTerrain : MonoBehaviour
 
 		terrainData.SetHeights(0, 0, heightMap);
 	}
-	public void Tidal() { }
-	public void Thermal() { }
-	public void River() { }
-	public void Wind() { }
+	public void Tidal() 
+	{
+		float[,] heightMap = terrainData.GetHeights(0, 0,
+			terrainData.heightmapResolution, terrainData.heightmapResolution);
 
+		for (int y = 0; y < terrainData.heightmapResolution; y++)
+			for (int x = 0; x < terrainData.heightmapResolution; x++)
+			{
+				Vector2 thisLocation = new Vector2(x, y);
+				List<Vector2> neighbors = GenerateNeighbors(thisLocation,
+					terrainData.heightmapResolution, terrainData.heightmapResolution);
+
+				foreach (Vector2 n in neighbors)
+					if (heightMap[x, y] < waterHeight && heightMap[(int)n.x, (int)n.y] > waterHeight)
+					{
+						heightMap[x, y] = waterHeight;
+						heightMap[(int)n.x, (int)n.y] = waterHeight;
+					}
+			}
+		terrainData.SetHeights(0, 0, heightMap);
+	}
+	public void Thermal() 
+	{
+		float[,] heightMap = terrainData.GetHeights(0, 0,
+			terrainData.heightmapResolution, terrainData.heightmapResolution);
+
+		for (int y = 0; y < terrainData.heightmapResolution; y++)
+			for (int x = 0; x < terrainData.heightmapResolution; x++)
+			{
+				Vector2 thisLocation = new Vector2(x, y);
+				List<Vector2> neighbors = GenerateNeighbors(thisLocation,
+					terrainData.heightmapResolution, terrainData.heightmapResolution);
+
+				foreach (Vector2 n in neighbors)
+					if (heightMap[x, y] > heightMap[(int)n.x, (int)n.y] + erosionStrength)
+					{
+						float erosionHeight = heightMap[x, y] * erosionAmount;
+						heightMap[x, y] -= erosionHeight;
+						heightMap[(int)n.x, (int)n.y] += erosionHeight;
+					}
+			}
+		terrainData.SetHeights(0, 0, heightMap);
+	}
+	public void River() 
+	{
+		float[,] heightMap = terrainData.GetHeights(0, 0,
+			terrainData.heightmapResolution, terrainData.heightmapResolution);
+		float[,] erosionMap = new float[terrainData.heightmapResolution, terrainData.heightmapResolution];
+
+		for (int i = 0; i < droplets; i++)
+		{
+			Vector2Int dropletPosition = new Vector2Int(
+				UnityEngine.Random.Range(0, terrainData.heightmapResolution),
+				UnityEngine.Random.Range(0, terrainData.heightmapResolution));
+
+			erosionMap[dropletPosition.x, dropletPosition.y] = erosionStrength;
+
+			for (int j = 0; j < springsPerRiver; j++)
+				erosionMap = RunRiver(dropletPosition, heightMap, erosionMap,
+					terrainData.heightmapResolution, terrainData.heightmapResolution);
+		}
+
+		for (int y = 0; y < terrainData.heightmapResolution; y++)
+			for (int x = 0; x < terrainData.heightmapResolution; x++)
+				if (erosionMap[x, y] > 0)
+					heightMap[x, y] -= erosionMap[x, y];
+
+		terrainData.SetHeights(0, 0, heightMap);
+	}
+
+	float[,] RunRiver(Vector2Int dropletPosition, float[,] heightMap, float[,] erosionMap, int width, int height)
+	{
+		float lifetime = erosionAmount;
+		while (erosionAmount > 0)
+		{
+			float heldSediment = 0;
+			List<Vector2> neighbors = GenerateNeighbors(dropletPosition, width, height);
+			neighbors.Shuffle();
+			bool foundLower = false;
+			foreach (Vector2 n in neighbors)
+				if (heightMap[(int)n.x, (int)n.y] < heightMap[dropletPosition.x, dropletPosition.y])
+				{
+					erosionMap[(int)n.x, (int)n.y] =
+						erosionMap[dropletPosition.x, dropletPosition.y];
+					dropletPosition = new Vector2Int((int)n.x, (int)n.y);
+					lifetime -= solubility;
+					heldSediment += solubility;
+					foundLower = true;
+					break;
+				}
+			if (!foundLower)
+			{
+				heightMap[dropletPosition.x, dropletPosition.y] += heldSediment;
+				break;
+			}
+		}
+		return erosionMap;
+	}
+
+	public void Wind() 
+	{
+		float[,] heightMap = terrainData.GetHeights(0, 0,
+			terrainData.heightmapResolution, terrainData.heightmapResolution);
+		int width = terrainData.heightmapResolution;
+		int height = terrainData.heightmapResolution;
+
+		float sinAngle = -Mathf.Sin(Mathf.Deg2Rad * windDirection);
+		float cosAngle = Mathf.Cos(Mathf.Deg2Rad * windDirection);
+
+		for (int y = -(height-1)*2; y <= height*2; y += 10)
+			for (int x = -(height-1)*2; x <= width*2; x += 1)
+			{
+				float thisNoise = Mathf.PerlinNoise(x * 0.06f, y * 0.06f) * 20 * erosionStrength;
+				int nx = x;
+				int digY = y + (int)thisNoise;
+				int ny = y + 5 + (int)thisNoise;
+
+				// Rotate the targets
+				Vector2 digCoords = new Vector2(
+					x * cosAngle - digY * sinAngle,
+					digY * cosAngle + x * sinAngle);
+				Vector2 pileCoords = new Vector2(
+					nx * cosAngle - ny * sinAngle,
+					ny * cosAngle + nx * sinAngle);
+
+				if (!((int)pileCoords.x < 0 || (int)pileCoords.x > (width - 1) ||
+					(int)pileCoords.y < 0 || (int)pileCoords.y > (height - 1) ||
+					(int)digCoords.x < 0 || (int)digCoords.x > (width - 1) ||
+					(int)digCoords.y < 0 || (int)digCoords.y > (height - 1)))
+				{
+					heightMap[(int)digCoords.x, (int)digCoords.y] -= 0.001f;
+					heightMap[(int)pileCoords.x, (int)pileCoords.y] += 0.001f;
+				}
+			}
+		terrainData.SetHeights(0, 0, heightMap);
+	}
 
 	public void AddWater()
 	{
@@ -392,7 +535,7 @@ public class CustomTerrain : MonoBehaviour
 
 	public void ApplyDetails()
 	{
-
+		float detailProgress = 0;
 		DetailPrototype[] newDetailPrototypes;
 		newDetailPrototypes = new DetailPrototype[details.Count];
 		int dIndex = 0;
@@ -425,6 +568,9 @@ public class CustomTerrain : MonoBehaviour
 		terrainData.detailPrototypes = newDetailPrototypes;
 
 		float[,] heightMap = terrainData.GetHeights(0, 0, terrainData.heightmapResolution, terrainData.heightmapResolution);
+
+		EditorUtility.DisplayProgressBar("Planting Details", "Planting...", detailProgress);
+		float progressMax = terrainData.detailPrototypes.Length;
 
 		for (int i = 0; i < terrainData.detailPrototypes.Length; i++)
 		{
@@ -460,9 +606,14 @@ public class CustomTerrain : MonoBehaviour
 					if ((thisHeight >= convertedMinHeight && thisHeight <= convertedMaxHeight) &&
 						(steepness >= details[i].minSlope && steepness <= details[i].maxSlope))
 					detailMap[y, x] = 1;
+
+					detailProgress++;
 				}
+			EditorUtility.DisplayProgressBar(
+				"Planting Details", "Planting...", detailProgress / progressMax);
 			terrainData.SetDetailLayer(0, 0, i, detailMap);
 		}
+		EditorUtility.ClearProgressBar();
 	}
 
 	public void AddNewDetail() => details.Add(new Detail());
@@ -619,7 +770,7 @@ public class CustomTerrain : MonoBehaviour
 			currentHeightMap = newHeightMap;
 			smoothProgress++;
 			EditorUtility.DisplayProgressBar("Smoothing Terrain", "Progress",
-				smoothProgress/smoothingIterations);
+				smoothProgress/iterations);
 		}
 		terrainData.SetHeights(0, 0, newHeightMap);
 		EditorUtility.ClearProgressBar();

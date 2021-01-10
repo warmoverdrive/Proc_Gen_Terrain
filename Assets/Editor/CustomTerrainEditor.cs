@@ -20,9 +20,12 @@ public class CustomTerrainEditor : Editor
 
 	SerializedProperty erosionType;
 	SerializedProperty erosionStrength;
+	SerializedProperty erosionAmount;
 	SerializedProperty springsPerRiver;
 	SerializedProperty solubility;
 	SerializedProperty droplets;
+	SerializedProperty windDirection;
+	SerializedProperty erosionIterations;
 	SerializedProperty erosionSmoothAmount;
 
 	GUITableState splatMapTable;
@@ -88,9 +91,12 @@ public class CustomTerrainEditor : Editor
 
 		erosionType = serializedObject.FindProperty("erosionType");
 		erosionStrength = serializedObject.FindProperty("erosionStrength");
+		erosionAmount = serializedObject.FindProperty("erosionAmount");
 		springsPerRiver = serializedObject.FindProperty("springsPerRiver");
 		solubility = serializedObject.FindProperty("solubility");
 		droplets = serializedObject.FindProperty("droplets");
+		windDirection = serializedObject.FindProperty("windDirection");
+		erosionIterations = serializedObject.FindProperty("erosionIterations");
 		erosionSmoothAmount = serializedObject.FindProperty("erosionSmoothAmount");
 
 		splatMapTable = new GUITableState("splatMapTable");
@@ -289,9 +295,12 @@ public class CustomTerrainEditor : Editor
 			GUILayout.Label("Erosion", EditorStyles.boldLabel);
 			EditorGUILayout.PropertyField(erosionType, new GUIContent("Erosion Type"));
 			EditorGUILayout.Slider(erosionStrength, 0f, 1f, new GUIContent("Erosion Strength"));
+			EditorGUILayout.Slider(erosionAmount, 0f, 1f, new GUIContent("Erosion Amount"));
 			EditorGUILayout.IntSlider(droplets, 0, 5000, new GUIContent("Droplets"));
 			EditorGUILayout.Slider(solubility, 0.001f, 1f, new GUIContent("Solubility"));
 			EditorGUILayout.IntSlider(springsPerRiver, 0, 20, new GUIContent("Springs per River"));
+			EditorGUILayout.Slider(windDirection, 0, 359, new GUIContent("Wind Direction"));
+			EditorGUILayout.IntSlider(erosionIterations, 1, 20, new GUIContent("Erosion Iterations"));
 			EditorGUILayout.IntSlider(erosionSmoothAmount, 0, 10, new GUIContent("Smooth Amount"));
 			if (GUILayout.Button("Erode"))
 				terrain.Erode();
