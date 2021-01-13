@@ -71,6 +71,7 @@
     <Compile Include="Assets\Scripts\Utils.cs" />
     <Compile Include="Assets\ShoreResources\WaveAnimation.cs" />
     <None Include="Assets\ShoreResources\foamShader.shader" />
+    <None Include="Assets\SkyDome\Sky.shader" />
     <Reference Include="UnityEngine">
       <HintPath>C:/Program Files/Unity/Hub/Editor/2019.4.11f1/Editor/Data/Managed/UnityEngine/UnityEngine.dll</HintPath>
     </Reference>
