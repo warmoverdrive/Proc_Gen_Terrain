@@ -65,6 +65,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\Editor\CustomTerrainEditor.cs" />
+    <Compile Include="Assets\Editor\TextureCreatorWindow.cs" />
     <Reference Include="UnityEngine">
       <HintPath>C:/Program Files/Unity/Hub/Editor/2019.4.11f1/Editor/Data/Managed/UnityEngine/UnityEngine.dll</HintPath>
     </Reference>
@@ -276,7 +277,7 @@
       <HintPath>C:/Program Files (x86)/Microsoft Visual Studio Tools for Unity/16.0/Editor/SyntaxTree.VisualStudio.Unity.Bridge.dll</HintPath>
     </Reference>
     <Reference Include="EditorGUITable">
-      <HintPath>D:/UNITY/Proc_Terrain_Gen/Assets/GUITable/Code/EditorGUITable.dll</HintPath>
+      <HintPath>D:/UNITY/Proc_Terrain_Gen/Assets/TerrainTools/GUITable/Code/EditorGUITable.dll</HintPath>
     </Reference>
     <Reference Include="nunit.framework">
       <HintPath>D:/UNITY/Proc_Terrain_Gen/Library/PackageCache/com.unity.ext.nunit@1.0.0/net35/unity-custom/nunit.framework.dll</HintPath>
@@ -676,10 +677,6 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="Assembly-CSharp-firstpass.csproj">
-      <Project>{D5946BEA-8E1B-D05E-CB71-A75BE35F9B27}</Project>
-      <Name>Assembly-CSharp-firstpass</Name>
-    </ProjectReference>
     <ProjectReference Include="Assembly-CSharp.csproj">
       <Project>{3456185C-B4F9-5B9D-3F5C-85D1F40E22A7}</Project>
       <Name>Assembly-CSharp</Name>

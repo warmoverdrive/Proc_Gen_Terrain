@@ -352,6 +352,8 @@ public class CustomTerrainEditor : Editor
 			EditorGUILayout.PropertyField(cloudDistancedTravelled, new GUIContent("Distance Travelled"));
 			if (GUILayout.Button("Generate Clouds"))
 				terrain.GenerateClouds();
+			if (GUILayout.Button("Remove Clouds"))
+				terrain.RemoveClouds();
 		}
 
 		showRandom = EditorGUILayout.Foldout(showRandom, "Random");
